@@ -1,0 +1,5 @@
+django-admin startproject <prokectname>
+cd <projectname>
+python manage.py startapp <appname>
+
+

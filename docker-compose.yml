@@ -1,0 +1,127 @@
+version: "3"
+
+services:
+  oauth2intra:
+    container_name: oauth2
+    env_file: .env
+    user: 1000:1000
+    build: oauth2intra/
+    # command: python /code/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - oauth2intra:/code
+    ports:
+      - 8000:8000
+    networks:
+      - network
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - 8000
+
+  clockapp:
+    container_name: clock
+    env_file: .env
+    user: 1000:1000
+    build: clockapp
+    # command: python /code/manage.py runserver 0.0.0.0:8001
+    volumes:
+      - clockapp:/code
+    ports:
+      - 8001:8001
+    networks:
+      - network
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - 8001
+
+  snakeapp:
+    container_name: snake
+    env_file: .env
+    user: 1000:1000
+    build: snakeapp
+    # command: python /code/manage.py runserver 0.0.0.0:8002
+    volumes:
+      - snakeapp:/code
+    ports:
+      - 8002:8002
+    networks:
+      - network
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - 8002
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    build:
+      context: nginx
+    env_file: .env
+    volumes:
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    restart: always
+    networks:
+      - network
+    depends_on:
+      - postgres
+  postgres:
+    container_name: postgres
+    env_file: .env
+    image: postgres:16.1-alpine
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+
+volumes:
+  clockapp:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: clockapp
+
+  snakeapp:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: snakeapp    
+
+  oauth2intra:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: oauth2intra
+
+  nginx:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: nginx/root
+      
+  postgres_data:
+
+networks:
+  network:
+    driver: bridge
