@@ -1,0 +1,16 @@
+project/
+│
+├── microservice1/
+│   ├── Dockerfile
+│   ├── app.py
+│   └── requirements.txt
+│
+├── microservice2/
+│   ├── Dockerfile
+│   └── ...
+│
+├── vault/
+│   ├── Dockerfile
+│   └── ...
+│
+└── docker-compose.yml

@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  vault:
+    build: ./vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "root"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    # Add volumes or other configurations as needed
+    networks:
+      - network
+    expose:
+      - 8200
+  
+  microservice1:
+    build: ./microservice1
+    ports:
+      - "8201:8201"
+    networks:
+      - network
+    depends_on:
+      - vault
+    
+
+networks:
+  network:
+    driver: bridge
+
